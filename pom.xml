@@ -491,15 +491,39 @@
                 <clojure.test.declared.namespace.only>true</clojure.test.declared.namespace.only>
             </properties>
         </profile>
+        <profile>
+          <id>europe</id>
+          <modules>
+              <module>storm-dist/binary</module>
+          </modules>
+          <properties>
+            <nexus-host>http://nexus.flipsports.net:8081</nexus-host>
+          </properties>
+        </profile>
+        <profile>
+          <id>china</id>
+          <modules>
+              <module>storm-dist/binary</module>
+          </modules>
+          <properties>
+            <nexus-host>http://nexus.fs.17gaming.com:8081</nexus-host>
+          </properties>
+        </profile>
     </profiles>
 
-    <distributionManagement>
-        <site>
-            <id>storm.maven.website</id>
-            <name>Storm Website</name>
-            <url>file:///tmp/site</url>
-        </site>
-    </distributionManagement>
+     <distributionManagement>
+  		<snapshotRepository>
+  			<id>flipsports-snapshots</id>
+  			<name>Internal Snapshots</name>
+  			<url>${nexus-host}/repository/maven-snapshots/</url>
+  		</snapshotRepository>
+  		<repository>
+  			<id>flipsports-releases</id>
+  			<name>Internal Releases</name>
+  			<url>${nexus-host}/repository/maven-releases/</url>
+  		</repository>
+  	</distributionManagement>
+
 
     <dependencyManagement>
         <dependencies>
