@@ -19,20 +19,30 @@
 import sys
 import os
 import traceback
+import json
+import io
+from datetime import datetime, date
 from collections import deque
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        
+        if isinstance(o, date):
+            return o.isoformat()
 
-json_encode = lambda x: json.dumps(x)
+        return json.JSONEncoder.default(self, o)
+
+json_encode = lambda x: json.dumps(x, cls=CustomJSONEncoder)
 json_decode = lambda x: json.loads(x)
 
 #reads lines and reconstructs newlines appropriately
 def readMsg():
+    #input_stream = io.open(0, encoding='utf-8')
     msg = ""
     while True:
+        # line = input_stream.readline()
         line = sys.stdin.readline()
         if not line:
             raise Exception('Read EOF from stdin')
@@ -75,8 +85,8 @@ def readTuple():
     return Tuple(cmd["id"], cmd["comp"], cmd["stream"], cmd["task"], cmd["tuple"])
 
 def sendMsgToParent(msg):
-    print json_encode(msg)
-    print "end"
+    print(json_encode(msg))
+    print("end")
     sys.stdout.flush()
 
 def sync():
@@ -109,7 +119,7 @@ def emitBolt(tup, stream=None, anchors = [], directTask=None):
     m = {"command": "emit"}
     if stream is not None:
         m["stream"] = stream
-    m["anchors"] = map(lambda a: a.id, anchors)
+    m["anchors"] = [a.id for a in anchors]
     if directTask is not None:
         m["task"] = directTask
     m["tuple"] = tup
@@ -196,7 +206,7 @@ class Bolt(object):
                     sync()
                 else:
                     self.process(tup)
-        except Exception, e:
+        except Exception as e:
             reportError(traceback.format_exc(e))
 
 class BasicBolt(object):
@@ -222,10 +232,10 @@ class BasicBolt(object):
                     try:
                         self.process(tup)
                         ack(tup)
-                    except Exception, e:
+                    except Exception as e:
                         reportError(traceback.format_exc(e))
                         fail(tup)
-        except Exception, e:
+        except Exception as e:
             reportError(traceback.format_exc(e))
 
 class Spout(object):
@@ -256,5 +266,5 @@ class Spout(object):
                 if msg["command"] == "fail":
                     self.fail(msg["id"])
                 sync()
-        except Exception, e:
+        except Exception as e:
             reportError(traceback.format_exc(e))
