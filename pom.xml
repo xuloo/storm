@@ -283,7 +283,7 @@
         <module>external/storm-jdbc</module>
         <module>external/storm-redis</module>
         <module>external/storm-eventhubs</module>
-        <module>external/flux</module>
+        <!--module>external/flux</module-->
         <module>external/sql</module>
         <module>external/storm-elasticsearch</module>
         <module>external/storm-solr</module>
